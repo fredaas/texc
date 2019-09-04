@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+
+import subprocess
+import os
+import time
+import argparse
+
+option_clean_current_dir = False
+root_file = None
+latexmkrc = os.path.join(os.path.dirname(os.path.realpath(__file__)), ".latexmkrc")
+
+def latexmk_clean():
+    commands = "latexmk -c -r {} {}".format(latexmkrc, root_file).split()
+    latexmk_subprocess_clean = subprocess.run(
+        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+def latexmk_simple():
+    commands = "latexmk -silent -f -r {} -bibtex -pdf {}" \
+        .format(latexmkrc, root_file).split()
+    latexmk_subprocess_simple = subprocess.run( 
+        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+def texparse_logfile():
+    error_log = None
+
+    print("TeXparse")
+    print("-" * 8 + "\n")
+
+    # Poll for 'main.log' until it's generated or until 'error_log_count' is
+    # reached
+    error_log_count = 0
+    error_log_path = os.path.abspath("main.log")
+    while error_log is None and error_log_count < 3:
+        try:
+            error_log = open(error_log_path, "r")
+            break;
+        except:
+            print("\x1b[38;5;39m[{}]\x1b[0m {}\n" \
+                .format("TeXparse info", "Could not find 'main.log'"))
+        error_log_count += 1
+        time.sleep(1)
+    if error_log == None:
+        quit(1)
+
+    line = error_log.readline()
+
+    num_errors = 0
+    num_warnings = 0
+    num_infos = 0
+
+    warnings = []
+    errors = []
+    infos = []
+
+    def consume_message(line):
+        message = line.strip("\n")
+        next_line = error_log.readline().rstrip("\n")
+        while len(next_line) != 0:
+            message += next_line
+            next_line = error_log.readline().rstrip("\n")
+        return message
+
+    while line:
+        # Found LaTeX error
+        if line.find("LaTeX Error") != -1:
+            line = consume_message(line)
+            x = line.find(":")
+            errors.append("\x1b[38;5;9m[{}]\x1b[0m {}\n" \
+                .format("Error", line[x + 2:]))
+            num_errors += 1
+        # Found LaTeX warning
+        elif line.find("LaTeX Warning") != -1:
+            line = consume_message(line) 
+            x = line.find(":")
+            warnings.append("\x1b[38;5;208m[{}]\x1b[0m {}\n" \
+                .format("Warning", line[x + 2:]))
+            num_warnings += 1
+        # Found LaTeX info
+        elif line.find("Overfull") != -1:
+            line = consume_message(line)
+            infos.append("\x1b[38;5;39m[{}]\x1b[0m {}\n" \
+                .format("Info", line))
+            num_infos += 1
+        line = error_log.readline()
+
+    warnings.sort()
+    errors.sort()
+    infos.sort()
+
+    for warning in warnings:
+        print(warning)
+    for error in errors:
+        print(error)
+    for info in infos:
+        print(info)
+
+    if num_errors == 0 and num_warnings == 0 and num_infos == 0:
+        print("\x1b[38;5;76m[{}]\x1b[0m {}\n" \
+            .format("LaTeX success", "No errors detected"))
+
+def init_argparse():
+    parser = argparse.ArgumentParser()
+
+    # Clean current directory, but leave the PDF
+    parser.add_argument(
+        "-c",
+        action = "store_true",
+        required = False
+    )
+
+    parser.add_argument(
+        "root_file",
+        nargs = 1
+    )
+    
+    return vars(parser.parse_args())
+
+if __name__ == "__main__":
+    argv = init_argparse() 
+
+    root_file = argv.get("root_file")[0]
+    option_clean_current_dir = argv.get("c")
+
+    if not os.path.isfile(root_file):
+        print("[TeXparse error] Invalid root file")
+        quit(1)
+
+    if option_clean_current_dir:
+        latexmk_clean()
+        quit(0)
+
+    time_start = time.time()
+    latexmk_simple()
+    texparse_logfile()
+    print("Build-latency: {:.1f} seconds".format(time.time() - time_start))
