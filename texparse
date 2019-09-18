@@ -83,6 +83,11 @@ def texparse_logfile():
             num_infos += 1
         line = error_log.readline()
 
+    if num_errors == 0 and num_warnings == 0 and num_infos == 0:
+        print("\x1b[38;5;76m[{}]\x1b[0m {}\n" \
+            .format("Success", "No errors detected"))
+        return
+
     warnings.sort()
     errors.sort()
     infos.sort()
@@ -93,10 +98,6 @@ def texparse_logfile():
         print(error)
     for info in infos:
         print(info)
-
-    if num_errors == 0 and num_warnings == 0 and num_infos == 0:
-        print("\x1b[38;5;76m[{}]\x1b[0m {}\n" \
-            .format("Success", "No errors detected"))
 
 def init_argparse():
     parser = argparse.ArgumentParser()
