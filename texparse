@@ -128,9 +128,8 @@ if __name__ == "__main__":
 
     if option_clean_current_dir:
         latexmk_clean()
-        quit(0)
-
-    time_start = time.time()
-    latexmk_simple()
-    texparse_logfile()
-    print("Build-latency: {:.1f} seconds".format(time.time() - time_start))
+    else:
+        time_start = time.time()
+        latexmk_simple()
+        texparse_logfile()
+        print("Build-latency: {:.1f} seconds".format(time.time() - time_start))
