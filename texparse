@@ -96,12 +96,12 @@ def texparse_logfile():
     errors.sort()
     infos.sort()
 
+    for info in infos:
+        print(info)
     for warning in warnings:
         print(warning)
     for error in errors:
         print(error)
-    for info in infos:
-        print(info)
 
 def init_argparse():
     parser = argparse.ArgumentParser()
