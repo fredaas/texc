@@ -12,7 +12,6 @@ if __name__ == "__main__":
     keys = "latexmk pdflatex xelatex lualatex biber bibtex".split()
     dependencies = { key: [ "-", "[ " + color("missing", RED) + " ]" ] for key in keys }
 
-
     for path in glob.glob("/usr/local/texlive/2018/bin/x86_64-linux/*", recursive = False):
         name = os.path.basename(path)
         if name in keys:
