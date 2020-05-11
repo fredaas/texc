@@ -7,8 +7,8 @@ import argparse
 import re
 
 warning_label = "\x1b[38;5;208m[Warning]\x1b[0m"
-info_label = "\x1b[38;5;39m[Info]\x1b[0m"
-error_label = "\x1b[38;5;9m[Error]\x1b[0m"
+info_label    = "\x1b[38;5;39m[Info]\x1b[0m"
+error_label   = "\x1b[38;5;9m[Error]\x1b[0m"
 success_label = "\x1b[38;5;76m[Success]\x1b[0m"
 
 option_clean_current_dir = False
@@ -20,7 +20,7 @@ def latexmk_clean():
     latexmk_subprocess_clean = subprocess.run(
         commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-def latexmk_simple():
+def make_latexmk():
     commands = "latexmk -silent -f -r {} -bibtex -pdf {}" \
         .format(latexmkrc, root_file).split()
     latexmk_subprocess_simple = subprocess.run(
@@ -28,31 +28,31 @@ def latexmk_simple():
 
 def texparse_logfile():
     error_log = None
+    error_log_path = os.path.abspath(re.sub("\.tex$", ".log", root_file));
 
-    # Poll for 'main.log' until it's generated or until 'error_log_count' is
+    # Poll for log file until it's generated or until 'error_log_count' is
     # reached
     error_log_count = 0
-    error_log_path = os.path.abspath("main.log")
     while error_log is None and error_log_count < 3:
         try:
             error_log = open(error_log_path, "r")
             break;
         except:
-            print(info_label + " Could not find 'main.log'\n")
+            print(info_label + " Waiting for the logfile...\n")
         error_log_count += 1
         time.sleep(1)
     if error_log == None:
+        print(error_label + " Could not find the logfile!\n")
         quit(1)
 
     line = error_log.readline()
 
-    num_errors = 0
+    num_errors   = 0
     num_warnings = 0
-    num_infos = 0
-
-    warnings = []
-    errors = []
-    infos = []
+    num_infos    = 0
+    warnings     = []
+    errors       = []
+    infos        = []
 
     def consume_message(line):
         message = line.strip("\n")
@@ -144,6 +144,6 @@ if __name__ == "__main__":
         latexmk_clean()
     else:
         time_start = time.time()
-        latexmk_simple()
+        make_latexmk()
         texparse_logfile()
         print("Build-latency: {:.1f} seconds".format(time.time() - time_start))
