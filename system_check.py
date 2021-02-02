@@ -8,6 +8,13 @@ GREEN = 112
 
 color = lambda s, c: "\033[38;5;{}m{}\033[0m".format(c, s)
 
+def get_texlive_vesions():
+    files = glob.glob("/usr/local/texlive/*", recursive=False)
+    basename = os.path.basename
+    normpath = os.path.normpath
+    files = [ basename(x) for x in files ]
+    files = [ x for x in files if x.isdigit() ]
+
 if __name__ == "__main__":
     keys = "latexmk pdflatex xelatex lualatex biber bibtex".split()
     dependencies = { key: [ "-", "[ " + color("missing", RED) + " ]" ] for key in keys }
