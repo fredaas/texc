@@ -3,17 +3,14 @@
 import glob
 import os
 
-RED   = 9
-GREEN = 112
-
-color = lambda s, c: "\033[38;5;{}m{}\033[0m".format(c, s)
+color = lambda s, c: "\x1b[38;5;{}m{}\x1b[0m".format(c, s)
 
 MISSING   = 0
 AVAILABLE = 1
 
 label = [
-    "[ " + color("missing", RED) + " ]",
-    "[ " + color("available", GREEN) + " ]"
+    "[ " + color("missing", 9) + " ]",
+    "[ " + color("available", 112) + " ]"
 ]
 
 def get_texlive_vesions():

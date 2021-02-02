@@ -6,6 +6,20 @@ import time
 import argparse
 import re
 
+color = lambda s, c: "\033[38;5;{}m{}\033[0m".format(c, s)
+
+WARNING = 0
+INFO    = 1
+ERROR   = 2
+SUCCESS = 3
+
+label = [
+    "[ " + color("warning", 208) + " ]",
+    "[ " + color("info", 39) + " ]",
+    "[ " + color("error", 9) + " ]",
+    "[ " + color("success", 76) + " ]",
+]
+
 warning_label = "\x1b[38;5;208m[Warning]\x1b[0m"
 info_label    = "\x1b[38;5;39m[Info]\x1b[0m"
 error_label   = "\x1b[38;5;9m[Error]\x1b[0m"
@@ -38,11 +52,11 @@ def texparse_logfile():
             error_log = open(error_log_path, "r", encoding="ISO-8859-1")
             break;
         except:
-            print(info_label + " Waiting for the logfile...\n")
+            print(label[INFO] + " Waiting for the logfile...\n")
         error_log_count += 1
         time.sleep(1)
     if error_log == None:
-        print(error_label + " No logfile found!\n")
+        print(label[ERROR] + " No logfile found!\n")
         quit(1)
 
     line = error_log.readline()
@@ -74,27 +88,27 @@ def texparse_logfile():
         if line.find("LaTeX Error") != -1:
             line = line.strip(". \n")
             x = line.find(":")
-            errors.append(error_label + " " + line[x + 2:] + "\n")
+            errors.append(label[ERROR] + " " + line[x + 2:] + "\n")
             num_errors += 1
         elif line.find("!") == 0:
             line = line.strip(". \n")
-            errors.append(error_label + " " + line[2:] + "\n")
+            errors.append(label[ERROR] + " " + line[2:] + "\n")
             num_errors += 1
         # Found warning
         elif line.find("LaTeX Warning") != -1:
             line = line.strip(". \n")
             x = line.find(":")
-            warnings.append(warning_label + " " + line[x + 2:] + "\n")
+            warnings.append(label[WARNING] + " " + line[x + 2:] + "\n")
             num_warnings += 1
         # Found info
         elif line.find("Overfull") != -1:
             line = line.strip(". \n")
-            infos.append(info_label + " " + line + "\n")
+            infos.append(label[INFO] + " " + line + "\n")
             num_infos += 1
         line = error_log.readline()
 
     if num_errors == 0 and num_warnings == 0 and num_infos == 0:
-        print(success_label + " No errors detected\n")
+        print(label[SUCCESS] + " No errors detected\n")
         return
 
     warnings.sort()
@@ -133,11 +147,11 @@ if __name__ == "__main__":
     option_clean_current_dir = argv.get("c")
 
     if option_clean_current_dir and root_file:
-        print("[Error]  Option -c/--clean takes no arguments")
+        print(label[ERROR] + " Option -c/--clean takes no arguments")
         quit(1)
 
     if root_file and not os.path.isfile(root_file):
-        print("[Error] Invalid root file")
+        print(label[ERROR] + " Invalid root file")
         quit(1)
 
     if option_clean_current_dir:
