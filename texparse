@@ -20,7 +20,7 @@ def latexmk_clean():
     latexmk_subprocess_clean = subprocess.run(
         commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-def make_latexmk():
+def latexmk_build():
     commands = "latexmk -silent -f -r {} -bibtex -pdf {}" \
         .format(latexmkrc, root_file).split()
     latexmk_subprocess_simple = subprocess.run(
@@ -35,14 +35,14 @@ def texparse_logfile():
     error_log_count = 0
     while error_log is None and error_log_count < 3:
         try:
-            error_log = open(error_log_path, "r")
+            error_log = open(error_log_path, "r", encoding="ISO-8859-1")
             break;
         except:
             print(info_label + " Waiting for the logfile...\n")
         error_log_count += 1
         time.sleep(1)
     if error_log == None:
-        print(error_label + " Could not find the logfile!\n")
+        print(error_label + " No logfile found!\n")
         quit(1)
 
     line = error_log.readline()
@@ -144,6 +144,6 @@ if __name__ == "__main__":
         latexmk_clean()
     else:
         time_start = time.time()
-        make_latexmk()
+        latexmk_build()
         texparse_logfile()
         print("Build-latency: {:.1f} seconds".format(time.time() - time_start))
