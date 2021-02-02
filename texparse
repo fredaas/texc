@@ -6,12 +6,12 @@ import time
 import argparse
 import re
 
-color = lambda s, c: "\033[38;5;{}m{}\033[0m".format(c, s)
-
 WARNING = 0
 INFO    = 1
 ERROR   = 2
 SUCCESS = 3
+
+color = lambda s, c: "\x1b[38;5;{}m{}\x1b[0m".format(c, s)
 
 label = [
     "[ " + color("warning", 208) + " ]",
@@ -19,11 +19,6 @@ label = [
     "[ " + color("error", 9) + " ]",
     "[ " + color("success", 76) + " ]",
 ]
-
-warning_label = "\x1b[38;5;208m[Warning]\x1b[0m"
-info_label    = "\x1b[38;5;39m[Info]\x1b[0m"
-error_label   = "\x1b[38;5;9m[Error]\x1b[0m"
-success_label = "\x1b[38;5;76m[Success]\x1b[0m"
 
 option_clean_current_dir = False
 root_file = None
@@ -106,6 +101,8 @@ def texparse_logfile():
             infos.append(label[INFO] + " " + line + "\n")
             num_infos += 1
         line = error_log.readline()
+
+    print()
 
     if num_errors == 0 and num_warnings == 0 and num_infos == 0:
         print(label[SUCCESS] + " No errors detected\n")
