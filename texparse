@@ -144,11 +144,11 @@ if __name__ == "__main__":
     option_clean_current_dir = argv.get("c")
 
     if option_clean_current_dir and root_file:
-        print(label[ERROR] + " Option -c/--clean takes no arguments")
+        print("[ERROR] Option -c/--clean takes no arguments")
         quit(1)
 
     if root_file and not os.path.isfile(root_file):
-        print(label[ERROR] + " Invalid root file")
+        print("[ERROR] Invalid root file")
         quit(1)
 
     if option_clean_current_dir:
