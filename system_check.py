@@ -62,7 +62,6 @@ def print_texlive_tools_status(version):
         print(" " * indent + path + " " * (max_path + space - len(path)), end="")
         print(" " * indent + status)
 
-
 if __name__ == "__main__":
     texlive_versions = get_texlive_versions()
     for version in texlive_versions:
