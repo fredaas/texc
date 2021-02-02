@@ -1,10 +1,7 @@
 DESCRIPTION
 --------------------------------------------------------------------------------
 
-Texparse is a thin wrapper on top of latexmk.
-
-Texparse calls latexmk with the appropriate arguments and displays debug
-information from the log file in a format that won't make your eyes bleed.
+Texparse is a small command-line interface to latexmk and a log-file parser.
 
 TEX LIVE SETUP
 --------------------------------------------------------------------------------
@@ -31,7 +28,7 @@ VERIFYING INSTALL
 Run system_check.py to check for required build tools.
 
 The full install of the most recent version of Tex Live comes bundled with the
-latest version of latexmk, which is required to use this program.
+latest version of latexmk, which is required to use Texparse.
 
 USAGE
 --------------------------------------------------------------------------------
