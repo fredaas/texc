@@ -22,20 +22,19 @@ label = [
     "[ " + color("success", 76) + " ]",
 ]
 
-option_clean_current_dir = False
 root_file = None
-latexmkrc = os.path.join(os.path.dirname(os.path.realpath(__file__)), ".latexmkrc")
+
+filepath = path.dirname(path.realpath(__file__))
 
 def latexmk_clean():
-    commands = "latexmk -c -r {}".format(latexmkrc).split()
-    latexmk_subprocess_clean = subprocess.run(
-        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    commands = "latexmk -c -r {}".format(
+        path.join(filepath, ".latexmkrc")).split()
+    subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 def latexmk_build():
     commands = "latexmk -silent -f -r {} -bibtex -pdf {}" \
-        .format(latexmkrc, root_file).split()
-    latexmk_subprocess_simple = subprocess.run(
-        commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        .format(path.join(filepath, ".latexmkrc"), root_file).split()
+    subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 def texparse_logcheck():
     error_log = None
