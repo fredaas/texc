@@ -1,7 +1,7 @@
 DESCRIPTION
 --------------------------------------------------------------------------------
 
-Texparse is a small command-line interface to latexmk and a log-file parser.
+Texparse is a simple command-line interface to latexmk and a log-file parser.
 
 TEX LIVE SETUP
 --------------------------------------------------------------------------------
