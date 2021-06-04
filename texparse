@@ -15,12 +15,21 @@ SUCCESS = 3
 
 color = lambda s, c: "\x1b[38;5;{}m{}\x1b[0m".format(c, s)
 
-label = [
+label_color = [
     "[ " + color("warning", 208) + " ]",
     "[ " + color("info", 39) + " ]",
     "[ " + color("error", 9) + " ]",
     "[ " + color("success", 76) + " ]",
 ]
+
+label_no_color = [
+    "[ warning ]",
+    "[ info ]",
+    "[ error ]",
+    "[ success ]",
+]
+
+label = label_color
 
 root_file = None
 
@@ -138,6 +147,13 @@ def init_argparse():
         required = False
     )
 
+    parser.add_argument(
+        "-n",
+        "--no-color",
+        action = "store_true",
+        required = False
+    )
+
     # Specify root file
     parser.add_argument(
         "root_file",
@@ -161,20 +177,23 @@ if __name__ == "__main__":
 
     argc = argvcount(argv)
 
-    if argc != 1:
-        print("[ERROR] Expected 1 argument, got", argc)
-        quit(1)
+    if isset(argv, "no_color"):
+        label = label_no_color
 
     if isset(argv, "clean"):
         latexmk_clean()
-    elif isset(argv, "system"):
+        quit(0)
+
+    if isset(argv, "system"):
         system_check.texlive()
-    else:
-        root_file = argv.get("root_file")
-        if not path.isfile(root_file):
-            print("[ERROR] Invalid root file")
-            quit(1)
-        time_start = time.time()
-        latexmk_build()
-        texparse_logcheck()
-        print("Build completed in {:.1f} seconds".format(time.time() - time_start))
+        quit(0)
+
+    root_file = argv.get("root_file")
+    if not path.isfile(root_file):
+        print("[ERROR] Invalid root file")
+        quit(1)
+
+    time_start = time.time()
+    latexmk_build()
+    texparse_logcheck()
+    print("Build completed in {:.1f} seconds".format(time.time() - time_start))
