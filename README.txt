@@ -13,7 +13,7 @@ Download the latest Tex Live distribution:
 Unpack and install:
 
     $ tar -xvf install-tl-unx.tar.gz
-    $ cd install-tl-unx
+    $ cd install-tl-<version>
     $ perl install-tl
 
 Update paths:
