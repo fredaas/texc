@@ -2,67 +2,63 @@
 
 import glob
 import os
-from datetime import datetime
+import re
 
-MISSING   = 0
-AVAILABLE = 1
+class Color:
+    RED     = 0
+    GREEN   = 1
 
-color = lambda s, c: "\x1b[38;5;{}m{}\x1b[0m".format(c, s)
+def color(string, key):
+    code = { Color.RED: "91", Color.GREEN: "92" }
+    return "\x1b[0;{}m{}\x1b[0m".format(code.get(key, "97"), string)
 
-label = [
-    "[ " + color("missing", 9) + " ]",
-    "[ " + color("available", 112) + " ]"
-]
+def texlive_releases():
+    install_path = "/usr/local/texlive"
 
-target_root = "/usr/local/texlive"
-
-target_bin = lambda version: "/usr/local/texlive/{}/bin/x86_64-linux".format(version)
-
-def get_texlive_versions():
-    if not os.path.isdir(target_root):
-        print("[ERROR] Couldn't find a Tex Live installation on your system!\n")
+    if not os.path.isdir(install_path):
+        print("{}: {} does not exist!".format(
+              color("ERROR", Color.RED), install_path))
         exit(1)
 
-    versions = glob.glob(target_root + "/*", recursive=False)
+    releases = []
 
-    years = [ str(x) for x in range(2014, datetime.now().year + 1) ]
+    for item in glob.glob(install_path + "/*"):
+        basename = os.path.basename(item)
+        pattern_match = re.match(r"\d{4}", basename)
+        if pattern_match:
+            releases.append(basename)
 
-    basename = os.path.basename
-    versions = [ basename(x) for x in versions ]
-    versions = [ x for x in versions if x in years ]
-
-    return versions
-
-def print_texlive_tools_status(version):
-    if not os.path.isdir(target_bin(version)):
-        print("[ERROR] Couldn't find any Tex Live tools on your system!\n")
+    if not releases:
+        print("{}: No releases found under {}!".format(
+              color("ERROR", Color.RED), install_path))
         exit(1)
 
-    keys = "latexmk pdflatex xelatex lualatex biber bibtex".split()
+    return releases
 
-    dependencies = { key: [ "-", label[MISSING] ] for key in keys }
+def contains(haystack, needle, func):
+    for item in haystack:
+        if func(needle, item):
+            return True
+    return False
 
-    for path in glob.glob(target_bin(version) + "/*", recursive=False):
-        name = os.path.basename(path)
-        if name in keys:
-            dependencies[name][0] = path
-            dependencies[name][1] = label[AVAILABLE]
+def main():
+    releases = texlive_releases()
 
-    max_key = len(max(keys, key=len))
-    max_path = len(max(dependencies.values(), key=lambda x: len(x[0]))[0])
+    required_bins = sorted("latexmk pdflatex xelatex lualatex biber bibtex".split())
 
-    print("Tex Live {}".format(version))
+    for release in releases:
+        print(f"Tex Live {release}")
+        print("-" * 79)
+        installed_bins = []
+        for path in glob.glob(f"/usr/local/texlive/{release}/bin/x86_64-linux/*"):
+            name = os.path.basename(path)
+            if name in required_bins:
+                installed_bins.append(path)
+        for name in required_bins:
+            if contains(installed_bins, name, lambda x,y: x == os.path.basename(y)):
+                print("[ {} ] {}".format(color("OK", Color.GREEN), name))
+            else:
+                print("[ {} ] {}".format(color("MISSING", Color.RED), name))
 
-    space = 2
-    indent = 4
-    for key in keys:
-        path = dependencies[key][0]
-        status = dependencies[key][1]
-        print(" " * indent + key + " " * (max_key + space - len(key)), end="")
-        print(" " * indent + path + " " * (max_path + space - len(path)), end="")
-        print(" " * indent + status)
-
-def texlive():
-    texlive_versions = get_texlive_versions()
-    for version in texlive_versions:
-        print_texlive_tools_status(version)
+if __name__ == "__main__":
+    main()
