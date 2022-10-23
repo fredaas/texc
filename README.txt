@@ -11,10 +11,7 @@ $ ./install.sh
 VERIFYING INSTALL
 --------------------------------------------------------------------------------
 
-Run system_check.py to check for required build tools.
-
-The full install of the most recent version of Tex Live comes bundled with the
-latest version of latexmk, which is required to use Texparse.
+$ ./check_install.py
 
 USAGE
 --------------------------------------------------------------------------------
