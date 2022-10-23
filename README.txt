@@ -8,7 +8,7 @@ INSTALL
 
 $ ./install.sh
 
-VERIFYING INSTALL
+VERIFY INSTALL
 --------------------------------------------------------------------------------
 
 $ ./check_install.py
