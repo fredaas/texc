@@ -6,8 +6,6 @@ import argparse
 import re
 import os.path as path
 
-import system_check
-
 WARNING = 0
 INFO    = 1
 ERROR   = 2
@@ -141,13 +139,6 @@ def init_argparse():
     )
 
     parser.add_argument(
-        "-s",
-        "--system",
-        action = "store_true",
-        required = False
-    )
-
-    parser.add_argument(
         "-n",
         "--no-color",
         action = "store_true",
@@ -182,10 +173,6 @@ if __name__ == "__main__":
 
     if isset(argv, "clean"):
         latexmk_clean()
-        quit(0)
-
-    if isset(argv, "system"):
-        system_check.texlive()
         quit(0)
 
     root_file = argv.get("root_file")
