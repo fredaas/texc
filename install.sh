@@ -11,8 +11,8 @@ INSTALL_DIR=`ls | rg -o "install-tl-\d+$"`
 TEXLIVE_RELEASE=`echo $INSTALL_DIR | rg -o -r '$1' "install-tl-(\d{4}).*$"`
 [ -z $TEXLIVE_RELEASE ] && echo "[ERROR] Failed to parse string" && exit 1
 
-# cd $INSTALL_DIR
-# sudo perl install-tl
+cd $INSTALL_DIR
+sudo perl install-tl
 
 cat << EOF
 
