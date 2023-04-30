@@ -32,7 +32,6 @@ fn source_dir() -> PathBuf {
     let mut cwd = env::current_exe().unwrap();
     cwd.pop();
     cwd.pop();
-    cwd.pop();
     cwd
 }
 
