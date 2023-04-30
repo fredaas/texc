@@ -6,6 +6,7 @@ use std::time::Duration;
 use std::process;
 use std::fs::File;
 use std::io::{BufRead,BufReader};
+use std::time::Instant;
 
 use clap::Parser;
 
@@ -159,6 +160,9 @@ fn main() {
         make_clean();
     }
     else {
+        let t_start = Instant::now();
         make_build(&name);
+        print!("Completed build in {:.4} seconds\n",
+            t_start.elapsed().as_millis() as f32 / 1000.0);
     }
 }
