@@ -21,11 +21,15 @@ const LATEX_STR_WARNING:  &str = "! LaTeX Warning:";
 const LATEX_STR_OVERFULL: &str = "Overfull";
 
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
+#[clap(group(
+    clap::ArgGroup::new("args")
+        .required(true)
+        .args(&["name", "clean"]),
+))]
 struct Cli {
     name: Option<String>,
 
-    #[arg(short, long)]
+    #[clap(short, long)]
     clean: bool,
 }
 
@@ -153,16 +157,18 @@ fn parse_log(filename: &str) {
 
 fn main() {
     let cli = Cli::parse();
-    let name: String = cli.name.unwrap_or(String::from("main.tex"));
-    let clean: bool = cli.clean;
 
-    if clean {
-        make_clean();
-    }
-    else {
+    if cli.name.is_some() {
+        let name = cli.name.unwrap();
         let t_start = Instant::now();
         make_build(&name);
-        print!("Completed build in {:.4} seconds\n",
+        print!("Build completed in {:.4} seconds!\n",
             t_start.elapsed().as_millis() as f32 / 1000.0);
+        process::exit(0);
+    }
+
+    if cli.clean {
+        make_clean();
+        process::exit(0);
     }
 }
