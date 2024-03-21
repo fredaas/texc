@@ -2,16 +2,23 @@
 
 set -e
 
-wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
-tar -xvf install-tl-unx.tar.gz
+ROOT=$(realpath "${BASH_SOURCE[0]}")
+ROOT=$(dirname "$ROOT")
+cd "$ROOT"
 
-INSTALL_DIR=`ls | rg -o "install-tl-\d+$"`
-[ -z $INSTALL_DIR ] && echo "[ERROR] Failed to parse string" && exit 1
+download_tar()
+{
+    DIR="$1" URL="$2" FILE=${URL##*/}
+    wget "$URL"
+    mkdir -p "$DIR" && tar -xvf "$FILE" -C $DIR --strip-components 1
+}
 
-TEXLIVE_RELEASE=`echo $INSTALL_DIR | rg -o -r '$1' "install-tl-(\d{4}).*$"`
-[ -z $TEXLIVE_RELEASE ] && echo "[ERROR] Failed to parse string" && exit 1
+INSTALL_DIR="texlive"
 
-cd $INSTALL_DIR
+download_tar "$INSTALL_DIR" "http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz"
+
+cd "$INSTALL_DIR"
+
 sudo perl install-tl
 
 cat << EOF
@@ -22,9 +29,9 @@ Installation complete!
 
 You may want to add these to your .bashrc:
 
-export MANPATH=/usr/local/texlive/$TEXLIVE_RELEASE/texmf-dist/doc/man:\$MANPATH
-export INFOPATH=/usr/local/texlive/$TEXLIVE_RELEASE/texmf-dist/doc/info:\$INFOPATH
-export PATH=/usr/local/texlive/$TEXLIVE_RELEASE/bin/x86_64-linux:\$PATH
+export MANPATH=/usr/local/texlive/<release>/texmf-dist/doc/man:\$MANPATH
+export INFOPATH=/usr/local/texlive/<release>/texmf-dist/doc/info:\$INFOPATH
+export PATH=/usr/local/texlive/<release>/bin/x86_64-linux:\$PATH
 
 -------------------------------------------------------------------------------
 
